@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "dev": "vite",
+    "buid": "vite buid",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "three": "^0.186.1"
   },
