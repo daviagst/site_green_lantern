@@ -1,16 +1,23 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-  <head>
-    <meta charset="utf-8" />
-    <title>Meu primeiro 3D</title>
-    <style>
-      body {
-        margin: 0;
-      }
-    </style>
-  </head>
-  <body>
-    <canvas id="c"></canvas>
-    <script type="module" src="/main.js"></script>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LANTERNAS - Explore as torpas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <section class="abertura">
+      <video class="universo" autoplay muted loop playsinline aria-hidden="true">
+        <source src="public/videos/nebulosa-verde-imersiva.mp4" type="video/mp4">
+      </video>
+      <div class="escurecer" aria-hidden="true"></div>
+      <img class="simbolo" src="public/img/green-lantern-symbol-fig.png" alt="tropa-dos-lanternas-verdes">
+      <p class="aviso-scroll">Role para explorar ↓</p>
+    </section>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
 </html>
