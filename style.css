@@ -6,6 +6,14 @@
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'Poppins';
+    src: url('/public/font/Poppins-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
 *{
     padding: 0;
     margin: 0;
@@ -101,7 +109,7 @@ body{
     white-space: pre;
     left: 10%;
     text-align: left;
-     line-height: 0.9;
+    line-height: 0.9;
 }
 
 .titulo-direita{
@@ -115,3 +123,85 @@ body{
     color: #139D0C
 }
 
+.descricao-tropa{
+    position: absolute;
+    top: 46%;
+    margin: 0;
+    right: 8%;
+    width: 30%;
+    z-index: 2;
+
+    color: white;
+    font-family: 'Poppins', Arial, sans-serif;
+    font-weight: 400;
+    font-size: clamp(16px, 1.3vw, 20px);
+    line-height: 1.45;
+
+    opacity: 0;
+    visibility: hidden;
+}
+
+.titulo-escolha{
+    position: absolute;
+    top: 10%;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0 20px;
+    z-index: 2;
+
+    font-family: 'Conduit', Arial, sans-serif;
+    font-size: clamp(32px, 5.5vw, 80px);
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+
+    opacity: 0;
+    visibility: hidden;
+}
+
+.opcoes-tropas{
+    position: absolute;
+    bottom: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+
+    display: flex;
+    gap: 28px;
+
+    opacity: 0;
+    visibility: hidden;
+}
+
+.opcoes-tropa{
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+
+    transition: transform 0.2s;
+}
+
+.opcoes-tropa:not(:disabled):hover{
+    transform: scale(1.15);
+}
+
+.opcoes-tropa:focus-visible{
+    outline: 2px solid white;
+    outline-offset: 6px;
+}
+
+.opcoes-tropa:disabled{
+    cursor: pointer;
+}
+
+.opcao-vermelha{
+    background: #ff1010;
+}
+
+.opcao-amarela{
+    background: #ffdc00;
+}

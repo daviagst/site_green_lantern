@@ -60,7 +60,6 @@ loader.load(
     const maiorDimensao = Math.max(tamanho.x, tamanho.y, tamanho.z)
 
     grupoAnel.add(modelo)
-    grupoAnel.scale.setScalar(0.2 / maiorDimensao)
 
     grupoAnel.rotation.set(
       THREE.MathUtils.degToRad(55),
@@ -68,7 +67,7 @@ loader.load(
       THREE.MathUtils.degToRad(-10)
     )
 
-    const escalaInicial = 0.5 / maiorDimensao
+    const escalaInicial = 0.4 / maiorDimensao
     const escalaFinal = 1.4 / maiorDimensao
 
     grupoAnel.scale.setScalar(escalaInicial)
@@ -81,7 +80,7 @@ loader.load(
       scrollTrigger: {
         trigger: '.abertura',
         start: 'top top',
-        end: () => `+=${window.innerHeight * 3}`,
+        end: () => `+=${window.innerHeight * 5}`,
         pin: true,
         scrub: 1, 
         invalidateOnRefresh: true
@@ -130,16 +129,125 @@ loader.load(
         opacity: 0
       },
       {
-        X: 0,
+        x: 0,
         opacity: 1,
         duration: 0.6
       },
       '<'
     )
+
+    //pequeno intervalo de scroll para o titulo ter mais tempo de tela
+    timeline.addLabel('descricao', '+=0.3')
+
+    //Titulo centralizadoa a direita no inicio; alinhado a esquerda na descrição
+    timeline.set('.titulo-direita', {
+      textAlign: 'left'
+    }, 'descricao')
+
+    //Retira "TROPA DOS"
+    timeline.to('.titulo-esquerda', {
+      opacity: 0,
+      x: -40,
+      duration: 0.3
+    }, 'descricao')
+
+    //O anel sai do centro e vai para a parte esquerda do site
+    timeline.to(grupoAnel.position, {
+      x: () => {
+        const alturaVisivel = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
+
+        const larguraVisivel =alturaVisivel * camera.aspect
+
+        return -larguraVisivel * 0.25
+      }, 
+      duration: 1
+    }, 'descricao')
+
+    timeline.to(grupoAnel.scale, {
+      x: 1.8 / maiorDimensao,
+      y: 1.8 / maiorDimensao,
+      z: 1.8 / maiorDimensao,
+      duration: 1
+    }, 'descricao')
+
+    // Leva o titulo para cima da descrição
+    // Usa a mesma largura e margem direita do paragrafo
+    timeline.to('.titulo-direita', {
+      top: '32%',
+      right: '8%',
+      width: '30%',
+      x: 0,
+      duration: 1
+    }, 'descricao')
+
+    //Revela a descrição com um pequeno movimento para cima
+    timeline.fromTo('.descricao-tropa', {
+      y: 20,
+      autoAlpha: 0
+    }, {
+      y: 0,
+      autoAlpha: 1,
+      duration: 0.7
+    }, 'descricao+=0.3')
+
+
+    // tempo para ler a descrição
+    timeline.to({}, {duration: 0.8})
+
+    timeline.addLabel('escolha')
+
+
+    timeline.to('.titulo-tropa', {
+      autoAlpha: 0,
+      duration: 0.5
+    }, 'escolha')
+
+    // Esconde o conteudo anterior
+    timeline.to(
+      ['.titulo-direita', '.descricao-tropa'],
+      {
+        autoAlpha: 0, 
+        duration: 0.5
+      },
+      'escolha'
+    )
+
+    //Traz o anel de volta para o centro
+    timeline.to(grupoAnel.position, {
+      x: 0, 
+      duration: 1
+    }, 'escolha')
+
+    //Tamnho do anel nessa etapa
+    timeline.to(grupoAnel.scale, {
+      x: 2 / maiorDimensao, 
+      y: 2 / maiorDimensao,
+      z: 2 / maiorDimensao,
+      duration: 1
+    }, 'escolha')
+
+    //Revela o titulo
+    timeline.fromTo(
+      '.titulo-escolha',
+      { y: 25, autoAlpha: 0},
+      {y: 0, autoAlpha: 1, duration: 0.6},
+      'escolha+=0.4'
+    )
+
+    //Revela as opçoes
+    timeline.fromTo(
+      '.opcoes-tropas',
+      {y: 20, autoAlpha: 0},
+      {y:0, autoAlpha: 1, duration: 0.6},
+      'escolha+=0.7'
+    )
+
+    //Mantem a selecao em tela por mais um trecho do scroll
+    timeline.to({}, {duration: 0.6})
+
+
     ScrollTrigger.refresh()
   },
-
-  
   
   undefined,
 
