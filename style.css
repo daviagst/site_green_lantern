@@ -1,3 +1,11 @@
+@font-face {
+    font-family: 'Conduit';
+    src: url('/public/font/ConduitITC-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 *{
     padding: 0;
     margin: 0;
@@ -68,12 +76,42 @@ body{
     z-index: 2;
 }
 
-
-.abertura h1{
-    color: #39ff88;
-    font-size: clamp(48px, 8vw, 100px);
+.titulo-tropa {
+    font-family: 'Conduit', Arial, sans-serif;
+    font-weight: 700;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
 }
 
-.abertura p{
-    font-size: 16px;
+.titulo-esquerda,
+.titulo-direita{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24%;
+    font-size: clamp(98px, 3.7vw, 70px);
+    line-height: 1;
+    font-weight: 700;
+    opacity: 0;
 }
+
+.titulo-esquerda{
+    white-space: pre;
+    left: 10%;
+    text-align: left;
+     line-height: 0.9;
+}
+
+.titulo-direita{
+    right: 10%;
+    text-align: center;
+    line-height: 0.9;
+}
+
+.texto-verde{
+    display: block;
+    color: #139D0C
+}
+

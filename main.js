@@ -81,7 +81,7 @@ loader.load(
       scrollTrigger: {
         trigger: '.abertura',
         start: 'top top',
-        end: () => `+=${window.innerHeight *2}`,
+        end: () => `+=${window.innerHeight * 3}`,
         pin: true,
         scrub: 1, 
         invalidateOnRefresh: true
@@ -109,7 +109,33 @@ loader.load(
       duration: 0.7
     }, 0.8)
 
+    timeline.fromTo(
+      '.titulo-esquerda',
+      {
+        x: -60,
+        opacity: 0
+      },
+      {
+        x: 0,
+        opacity: 1,
+        duration: 0.6
+      },
+      '>'
+    )
 
+    timeline.fromTo(
+      '.titulo-direita',
+      {
+        x: 60,
+        opacity: 0
+      },
+      {
+        X: 0,
+        opacity: 1,
+        duration: 0.6
+      },
+      '<'
+    )
     ScrollTrigger.refresh()
   },
 
