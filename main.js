@@ -43,7 +43,7 @@ scene.add(grupoAnel)
 const loader = new GLTFLoader()
 
 loader.load(
-  '/arquivos3D/green_lantern_ring.glb',
+  './arquivos3D/green_lantern_ring.glb',
 
   (gltf) => {
     const modelo = gltf.scene
