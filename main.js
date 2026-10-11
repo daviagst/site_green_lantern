@@ -68,6 +68,11 @@ loader.load(
 
     grupoAnel.add(modelo)
     grupoAnel.scale.setScalar(2 / maiorDimensao)
+    grupoAnel.rotation.set(
+        THREE.MathUtils.degToRad(55),
+        THREE.MathUtils.degToRad(-20),
+        THREE.MathUtils.degToRad(-10)
+    )
   },
 
   undefined,
