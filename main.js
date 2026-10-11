@@ -1,5 +1,10 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { time } from 'three/tsl'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const container = document.querySelector('.anel-3d')
 
@@ -52,17 +57,63 @@ loader.load(
     modelo.position.sub(centro)
 
     //Ajusta o tamanho sem depender da escala do arquivo
-    const maiorDimensão = Math.max(tamanho.x, tamanho.y, tamanho.z)
+    const maiorDimensao = Math.max(tamanho.x, tamanho.y, tamanho.z)
 
     grupoAnel.add(modelo)
-    grupoAnel.scale.setScalar(0.2 / maiorDimensão)
+    grupoAnel.scale.setScalar(0.2 / maiorDimensao)
 
     grupoAnel.rotation.set(
       THREE.MathUtils.degToRad(55),
       THREE.MathUtils.degToRad(-20),
       THREE.MathUtils.degToRad(-10)
     )
+
+    const escalaInicial = 0.5 / maiorDimensao
+    const escalaFinal = 1.4 / maiorDimensao
+
+    grupoAnel.scale.setScalar(escalaInicial)
+
+    const timeline = gsap.timeline({
+      defaults: {
+        ease: 'none'
+      },
+
+      scrollTrigger: {
+        trigger: '.abertura',
+        start: 'top top',
+        end: () => `+=${window.innerHeight *2}`,
+        pin: true,
+        scrub: 1, 
+        invalidateOnRefresh: true
+      }
+    })
+
+    //O aviso desaparece no inicio da rolagem
+    timeline.to('.aviso-scroll', {
+      opacity: 0, 
+      duration: 0.1
+    }, 0)
+
+    // O símbolo diminui a opacidade suavemente
+    timeline.to('.simbolo', {
+      opacity: 0.1,
+      duration: 0.9
+    }, 0)
+
+
+    //Depois o anel cresce
+    timeline.to(grupoAnel.scale, {
+      x: escalaFinal,
+      y: escalaFinal,
+      z: escalaFinal,
+      duration: 0.7
+    }, 0.8)
+
+
+    ScrollTrigger.refresh()
   },
+
+  
   
   undefined,
 
