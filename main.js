@@ -250,7 +250,7 @@ loader.load(
     const videoUniverso = document.querySelector('.universo')
     const simbolo = document.querySelector('.simbolo')
     const nomeTropa = document.querySelector('.texto-verde')
-    const descricao = document.querySelector('descicao-tropa')
+    const descricao = document.querySelector('.descricao-tropa')
     const botaoTroca = document.querySelector('.opcao-vermelha')
 
     //Guarda os dados atuais para permitir voltar ao verde
@@ -265,8 +265,9 @@ loader.load(
       },
       vermelha: {
         modelo: null,
-        arquivo: './arquivos3D/anel-vermelho.glb',
-        video: './videos/nebulosa-vermelha.mp4',
+        arquivo: '/arquivos3D/anel_vermelho.glb',
+        video: '/videos/nebulosa-vermelha.mp4',
+        simbolo: '/img/red-lantern-symbol-fig.png',
         nome: 'VERMELHOS',
         cor: '#ed1717',
         descricao:
@@ -284,12 +285,104 @@ loader.load(
 
       trocando = true
       botaoTroca.disabled = true
-      botaoTroca.setAttribute('arial-busy', 'true')
+      botaoTroca.setAttribute('aria-busy', 'true')
 
       const dados = tropas[destino]
 
-      
+      try {
+        //Carregar somente na primeira escolha dessa tropa
+        if(!dados.modelo){
+          const arquivo = await loader.loadAsync(dados.arquivo)
+          const novoModelo = arquivo.scene
+
+          const caixaNova = new THREE.Box3().setFromObject(novoModelo)
+          const tamanhoNovo = caixaNova.getSize(new THREE.Vector3())
+          const centroNovo = caixaNova.getCenter(new THREE.Vector3())
+
+          const maiorDimensaoNova = Math.max(
+            tamanhoNovo.x,
+            tamanhoNovo.y,
+            tamanhoNovo.z
+          )
+
+          if(maiorDimensaoNova <= 0){
+            throw new Error('O modelo carregado não possui tamanho válido.')
+          }
+
+          novoModelo.position.sub(centroNovo)
+
+          //Iguala o tamanho de referencia ao do modelo verde
+          //Assim, as escalas da timeline continuam funcionando
+          const suporte = new THREE.Group()
+          suporte.add(novoModelo)
+          suporte.scale.setScalar(maiorDimensao / maiorDimensaoNova)
+
+          dados.modelo = suporte
+        }
+
+        //Confere imagem antes de substituit a apresentação
+        const imagem = new Image()
+        imagem.src = dados.simbolo
+        await imagem.decode()
+
+        //Troca o anel, mantendo o grupo animado pela a timeline
+        grupoAnel.remove(tropas[tropaAtual].modelo)
+        grupoAnel.add(dados.modelo)
+
+        //Troca os textos e a cor 
+        nomeTropa.textContent = dados.nome
+        nomeTropa.style.color = dados.cor
+        descricao.textContent = dados.descricao
+
+        //Troca o símbolo
+        simbolo.src = dados.simbolo
+        simbolo.alt = `Simbolo dos Lanternas ${dados.nome.toLowerCase()}`
+
+        //Troca de video
+        videoUniverso.src = dados.video
+        videoUniverso.load()
+        videoUniverso.play().catch((erro) => {
+          console.warn('Não foi possivel iniciar o video:', erro)
+        })
+
+        tropaAtual = destino
+
+        //O mesmo botão perimite escolher a outra tropa 
+        const proximaTropa = destino === 'verde' ? 'vermelha' : 'verde'
+
+        botaoTroca.dataset.tropa = proximaTropa
+        botaoTroca.style.backgroundColor = tropas[proximaTropa].cor
+        botaoTroca.setAttribute(
+          'aria-label', proximaTropa === 'verde' ? 'Lanternas Verdes' : 'Lanternas Vermelhos'
+        )
+
+        //Retorna ao começo da apresentação
+        const controleScroll = timeline.scrollTrigger
+
+        window.scrollTo({
+          top: controleScroll.start,
+          behavior: 'instant'
+        })
+
+        ScrollTrigger.update()
+
+        // Evita que o scrub fique alcançando a posição anterior
+        controleScroll.getTween()?.progress(1)
+        timeline.progress(0)
+
+      } catch(erro){
+        console.log('Erro ao trocar de tropa:', erro)
+        alert('Não foi possível carregar a tropa. Confira os arquivos e os caminhos.')
+      } finally {
+        trocando = false
+        botaoTroca.disabled = false
+        botaoTroca.removeAttribute('aria-busy')
+      }
     }
+    
+    botaoTroca.addEventListener('click', () => {
+      trocarTropa(botaoTroca.dataset.tropa)
+    })
   },
   
   undefined,
