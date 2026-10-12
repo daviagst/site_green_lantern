@@ -2,7 +2,6 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { time } from 'three/tsl'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -247,6 +246,50 @@ loader.load(
 
 
     ScrollTrigger.refresh()
+
+    const videoUniverso = document.querySelector('.universo')
+    const simbolo = document.querySelector('.simbolo')
+    const nomeTropa = document.querySelector('.texto-verde')
+    const descricao = document.querySelector('descicao-tropa')
+    const botaoTroca = document.querySelector('.opcao-vermelha')
+
+    //Guarda os dados atuais para permitir voltar ao verde
+    const tropas = {
+      verde: {
+        modelo,
+        video: videoUniverso.currentSrc || videoUniverso.querySelector('source').src,
+        simbolo: simbolo.getAttribute('src'),
+        nome: 'VERDES',
+        cor: '#139d0c',
+        descricao: descricao.textContent.trim()
+      },
+      vermelha: {
+        modelo: null,
+        arquivo: './arquivos3D/anel-vermelho.glb',
+        video: './videos/nebulosa-vermelha.mp4',
+        nome: 'VERMELHOS',
+        cor: '#ed1717',
+        descricao:
+        'Movidos pela raiva, os Lanternas Vermelhos usam anéis ' +
+        'alimentados pela luz vermelha do espectro emocional. ' +
+        'Liderados por Atrocitus, transformam a dor e as perdas ' +
+        'que sofreram em poder e em uma busca por vingança.'
+      }
+    }
+
+    let tropaAtual = 'verde'
+    let trocando = false
+    async function trocarTropa(destino) {
+      if(trocando || destino === tropaAtual) return
+
+      trocando = true
+      botaoTroca.disabled = true
+      botaoTroca.setAttribute('arial-busy', 'true')
+
+      const dados = tropas[destino]
+
+      
+    }
   },
   
   undefined,
