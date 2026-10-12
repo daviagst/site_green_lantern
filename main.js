@@ -251,7 +251,7 @@ loader.load(
     const simbolo = document.querySelector('.simbolo')
     const nomeTropa = document.querySelector('.texto-verde')
     const descricao = document.querySelector('.descricao-tropa')
-    const botaoTroca = document.querySelector('.opcao-vermelha')
+    const botoesTropas = document.querySelectorAll('.opcoes-tropas button[data-tropa]')
 
     //Guarda os dados atuais para permitir voltar ao verde
     const tropas = {
@@ -275,6 +275,21 @@ loader.load(
         'alimentados pela luz vermelha do espectro emocional. ' +
         'Liderados por Atrocitus, transformam a dor e as perdas ' +
         'que sofreram em poder e em uma busca por vingança.'
+      },
+
+      amarela: {
+        modelo: null,
+        arquivo: '/arquivos3D/anel_amarelo.glb',
+        video: '/videos/nebulosa-amarela.mp4',
+        simbolo: '/img/yellow-lantern-symbol-fig.png',
+        nome: 'AMARELOS',
+        cor: '#ffdc00',
+        descricao: 
+          'A Tropa Sinestro utiliza a luz amarela do espectro emocional, ' +
+          'alimentada pelo medo. Seus integrantes são escolhidos pela ' +
+          'capacidade de provocar terror. Liderados por Sinestro, ' +
+          'enfrentam os Lanternas Verdes e buscam impor sua visão ' +
+          'de ordem ao universo.'
       }
     }
 
@@ -284,8 +299,10 @@ loader.load(
       if(trocando || destino === tropaAtual) return
 
       trocando = true
-      botaoTroca.disabled = true
-      botaoTroca.setAttribute('aria-busy', 'true')
+      botoesTropas.forEach((botao) => {
+        botao.disabled = true
+        botao.setAttribute('aria-busy', 'true')
+      })
 
       const dados = tropas[destino]
 
@@ -319,7 +336,7 @@ loader.load(
 
           dados.modelo = suporte
         }
-
+        
         //Confere imagem antes de substituit a apresentação
         const imagem = new Image()
         imagem.src = dados.simbolo
@@ -348,13 +365,9 @@ loader.load(
         tropaAtual = destino
 
         //O mesmo botão perimite escolher a outra tropa 
-        const proximaTropa = destino === 'verde' ? 'vermelha' : 'verde'
-
-        botaoTroca.dataset.tropa = proximaTropa
-        botaoTroca.style.backgroundColor = tropas[proximaTropa].cor
-        botaoTroca.setAttribute(
-          'aria-label', proximaTropa === 'verde' ? 'Lanternas Verdes' : 'Lanternas Vermelhos'
-        )
+        botoesTropas.forEach((botao) => {
+          botao.setAttribute('aria-pressed', String(botao.dataset.tropa === tropaAtual))
+        })
 
         //Retorna ao começo da apresentação
         const controleScroll = timeline.scrollTrigger
@@ -375,13 +388,17 @@ loader.load(
         alert('Não foi possível carregar a tropa. Confira os arquivos e os caminhos.')
       } finally {
         trocando = false
-        botaoTroca.disabled = false
-        botaoTroca.removeAttribute('aria-busy')
+        botoesTropas.forEach((botao) => {
+          botao.disabled = false
+          botao.removeAttribute('aria-busy')
+        })
       }
     }
     
-    botaoTroca.addEventListener('click', () => {
-      trocarTropa(botaoTroca.dataset.tropa)
+    botoesTropas.forEach((botao) => {
+      botao.addEventListener('click', () => {
+        trocarTropa((botao.dataset.tropa))
+      })
     })
   },
   

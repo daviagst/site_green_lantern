@@ -205,3 +205,12 @@ body{
 .opcao-amarela{
     background: #ffdc00;
 }
+
+.opcao-verde{
+    background-color: #139D0C;
+}
+
+.opcoes-tropas button[aria-pressed="true"]{
+    outline: 2px solid white;
+    outline-offset: 5px;
+}
