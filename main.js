@@ -39,6 +39,30 @@ scene.add(luzPrincipal)
 const grupoAnel = new THREE.Group()
 scene.add(grupoAnel)
 
+const abertura = document.querySelector('.abertura')
+
+//Deslocamento vertical definido pelo o scroll
+const movimentoAnel = {y: 0}
+
+function celular(){
+  return window.matchMedia('(max-width: 767px), ' + '(max-width: 1023px) and (max-height: 500px)').matches
+}
+
+function valorLayout(nome){
+  return getComputedStyle(abertura).getPropertyValue(nome).trim()
+}
+
+function alturaVisivel3D(){
+  return 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
+}
+
+// Limita o tamanho do anel pela largura disponível
+function tamanhoAnel(tamanhoDesktop){
+  const larguraVisivel = alturaVisivel3D() * camera.aspect
+
+  return Math.min( tamanhoDesktop, larguraVisivel * (celular() ? 0.65 : 0.38))
+}
+
 const loader = new GLTFLoader()
 
 loader.load(
@@ -67,7 +91,7 @@ loader.load(
     )
 
     const escalaInicial = 0.4 / maiorDimensao
-    const escalaFinal = 1.4 / maiorDimensao
+    const escalaFinal = () => tamanhoAnel(1.4) / maiorDimensao
 
     grupoAnel.scale.setScalar(escalaInicial)
 
@@ -153,31 +177,41 @@ loader.load(
     //O anel sai do centro e vai para a parte esquerda do site
     timeline.to(grupoAnel.position, {
       x: () => {
-        const alturaVisivel = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
+        if(celular()) return 0
 
-        const larguraVisivel =alturaVisivel * camera.aspect
-
+        const larguraVisivel = alturaVisivel3D() * camera.aspect
         return -larguraVisivel * 0.25
       }, 
       duration: 1
     }, 'descricao')
 
     timeline.to(grupoAnel.scale, {
-      x: 1.8 / maiorDimensao,
-      y: 1.8 / maiorDimensao,
-      z: 1.8 / maiorDimensao,
+      x: () => tamanhoAnel(1.8) / maiorDimensao,
+      y: () => tamanhoAnel(1.8) / maiorDimensao,
+      z: () => tamanhoAnel(1.8) / maiorDimensao,
+      duration: 1
+    }, 'descricao')
+
+    // No celular, sobe o anel para liberar espaço para o texto
+    timeline.to(movimentoAnel, {
+      y: () => celular() ? alturaVisivel3D() * 0.25 : 0,
       duration: 1
     }, 'descricao')
 
     // Leva o titulo para cima da descrição
     // Usa a mesma largura e margem direita do paragrafo
     timeline.to('.titulo-direita', {
-      top: '32%',
-      right: '8%',
-      width: '30%',
+      top: () => valorLayout('--titulo-top-inicial'),
+      right: () => valorLayout('--titulo-direita-inicial'),
+      width: () => valorLayout('--titulo-largura-inicial')
+    }, {
+      top: () => valorLayout('--titulo-top-descricao'),
+      right: () => valorLayout('--titulo-direita-descricao'),
+      width: () => valorLayout('--titulo-largura-descricao'),
       x: 0,
-      duration: 1
-    }, 'descricao')
+      duration: 1,
+      immediateRender: false
+    },'descricao')
 
     //Revela a descrição com um pequeno movimento para cima
     timeline.fromTo('.descricao-tropa', {
@@ -219,9 +253,14 @@ loader.load(
 
     //Tamnho do anel nessa etapa
     timeline.to(grupoAnel.scale, {
-      x: 2 / maiorDimensao, 
-      y: 2 / maiorDimensao,
-      z: 2 / maiorDimensao,
+      x: () => tamanhoAnel(2) / maiorDimensao, 
+      x: () => tamanhoAnel(2) / maiorDimensao,
+      z: () => tamanhoAnel(2) / maiorDimensao,
+      duration: 1
+    }, 'escolha')
+
+    timeline.to(movimentoAnel, {
+      y: 0,
       duration: 1
     }, 'escolha')
 
@@ -414,7 +453,7 @@ renderer.setAnimationLoop((tempo) => {
   const segundos = tempo / 1000
 
   //Flutuação suave
-  grupoAnel.position.y = Math.sin(segundos * 1.2) * 0.08
+  grupoAnel.position.y = movimentoAnel.y + Math.sin(segundos * 1.2) * 0.08
 
   //Inclinação suave nos eixos X e Y
   grupoAnel.rotation.x = THREE.MathUtils.degToRad(55) + Math.sin(segundos * 0.7) * 0.1
