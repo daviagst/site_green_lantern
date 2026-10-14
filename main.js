@@ -45,7 +45,7 @@ const abertura = document.querySelector('.abertura')
 const movimentoAnel = {y: 0}
 
 function celular(){
-  return window.matchMedia('(max-width: 767px), ' + '(max-width: 1023px) and (max-height: 500px)').matches
+  return window.matchMedia('(max-width: 767px), ' + '(max-width: 1366px) and (orientation: portrait), ' + '(max-width: 1023px) and (max-height: 500px)').matches
 }
 
 function valorLayout(nome){
@@ -58,9 +58,33 @@ function alturaVisivel3D(){
 
 // Limita o tamanho do anel pela largura disponível
 function tamanhoAnel(tamanhoDesktop){
-  const larguraVisivel = alturaVisivel3D() * camera.aspect
+  const altura = alturaVisivel3D()
+  const largura = altura * camera.aspect
 
-  return Math.min( tamanhoDesktop, larguraVisivel * (celular() ? 0.65 : 0.38))
+  if (celular()) {
+    return Math.min(tamanhoDesktop, largura * 0.5, altura * 0.22)
+  }
+  return Math.min(tamanhoDesktop, largura * 0.38)
+}
+
+function tamanhoAnelDescricao() {
+  if (celular()) {
+    return Math.min(
+      tamanhoAnel(1.8),
+      alturaVisivel3D() * 0.22
+    )
+  }
+
+  return tamanhoAnel(1.8)
+}
+
+function excessoDescricao(){
+  if(!celular()) return 0
+
+  const paragrafo = document.querySelector('.descricao-tropa')
+  const limite = abertura.clientHeight - 32
+
+  return Math.max(0, paragrafo.offsetTop + paragrafo.offsetHeight - limite)
 }
 
 const loader = new GLTFLoader()
@@ -134,11 +158,13 @@ loader.load(
     timeline.fromTo(
       '.titulo-esquerda',
       {
-        x: -60,
+        x: () => celular() ? 0 : -60,
+        x: () => celular() ? 16 : 0,
         opacity: 0
       },
       {
         x: 0,
+        y: 0,
         opacity: 1,
         duration: 0.6
       },
@@ -148,11 +174,13 @@ loader.load(
     timeline.fromTo(
       '.titulo-direita',
       {
-        x: 60,
+        x: () => celular() ? 0 : 60,
+        y: () => celular() ? 16 : 0,
         opacity: 0
       },
       {
         x: 0,
+        y: 0,
         opacity: 1,
         duration: 0.6
       },
@@ -164,13 +192,14 @@ loader.load(
 
     //Titulo centralizadoa a direita no inicio; alinhado a esquerda na descrição
     timeline.set('.titulo-direita', {
-      textAlign: 'left'
+      textAlign: () => celular() ? 'center' : 'left',
     }, 'descricao')
 
     //Retira "TROPA DOS"
     timeline.to('.titulo-esquerda', {
       opacity: 0,
-      x: -40,
+      x: () => celular() ? 0 : -40,
+      y: () => celular() ? -12 : 0,
       duration: 0.3
     }, 'descricao')
 
@@ -180,15 +209,15 @@ loader.load(
         if(celular()) return 0
 
         const larguraVisivel = alturaVisivel3D() * camera.aspect
-        return -larguraVisivel * 0.25
+        return -larguraVisivel * 0.12
       }, 
       duration: 1
     }, 'descricao')
 
     timeline.to(grupoAnel.scale, {
-      x: () => tamanhoAnel(1.8) / maiorDimensao,
-      y: () => tamanhoAnel(1.8) / maiorDimensao,
-      z: () => tamanhoAnel(1.8) / maiorDimensao,
+      x: () => tamanhoAnelDescricao() / maiorDimensao,
+      y: () => tamanhoAnelDescricao() / maiorDimensao,
+      z: () => tamanhoAnelDescricao() / maiorDimensao,
       duration: 1
     }, 'descricao')
 
@@ -200,18 +229,24 @@ loader.load(
 
     // Leva o titulo para cima da descrição
     // Usa a mesma largura e margem direita do paragrafo
-    timeline.to('.titulo-direita', {
-      top: () => valorLayout('--titulo-top-inicial'),
-      right: () => valorLayout('--titulo-direita-inicial'),
-      width: () => valorLayout('--titulo-largura-inicial')
-    }, {
-      top: () => valorLayout('--titulo-top-descricao'),
-      right: () => valorLayout('--titulo-direita-descricao'),
-      width: () => valorLayout('--titulo-largura-descricao'),
-      x: 0,
-      duration: 1,
-      immediateRender: false
-    },'descricao')
+    timeline.fromTo(
+      '.titulo-direita', 
+      {
+        top: () => valorLayout('--titulo-top-inicial'),
+        right: () => valorLayout('--titulo-direita-inicial'),
+        width: () => valorLayout('--titulo-largura-inicial')
+      },
+      {
+        top: () => valorLayout('--titulo-top-descricao'),
+        right: () => valorLayout('--titulo-direita-descricao'),
+        width: () => valorLayout('--titulo-largura-descricao'),
+        textAlign: () => celular() ? 'center' : 'left',
+        x: 0,
+        duration: 1,
+        immediateRender: false
+      },
+      'descricao'
+    )
 
     //Revela a descrição com um pequeno movimento para cima
     timeline.fromTo('.descricao-tropa', {
@@ -224,10 +259,37 @@ loader.load(
     }, 'descricao+=0.3')
 
 
-    // tempo para ler a descrição
-    timeline.to({}, {duration: 0.8})
+    // Primeiro mantém as informações paradas para leitura
+    timeline.to({}, { duration: 0.8 })
+
+    timeline.addLabel('leitura')
+
+    // Se faltar altura, retira o anel antes de subir o texto
+    timeline.to('.anel-3d', {
+      opacity: () => excessoDescricao() > 0 ? 0 : 1,
+      duration: 0.25
+    }, 'leitura')
+
+    // Move título e descrição juntos, sem criar rolagem interna
+    timeline.fromTo(
+      ['.titulo-direita', '.descricao-tropa'],
+      { y: 0 },
+      {
+        y: () => -excessoDescricao(),
+        duration: 0.9,
+        immediateRender: false
+      },
+      'leitura+=0.25'
+    )
+
+    timeline.to({}, { duration: 0.5 })
 
     timeline.addLabel('escolha')
+
+    timeline.to('.anel-3d', {
+      opacity: 1,
+      duration: 0.5
+    }, 'escolha+=0.5')
 
 
     timeline.to('.titulo-tropa', {
@@ -254,7 +316,7 @@ loader.load(
     //Tamnho do anel nessa etapa
     timeline.to(grupoAnel.scale, {
       x: () => tamanhoAnel(2) / maiorDimensao, 
-      x: () => tamanhoAnel(2) / maiorDimensao,
+      y: () => tamanhoAnel(2) / maiorDimensao,
       z: () => tamanhoAnel(2) / maiorDimensao,
       duration: 1
     }, 'escolha')
@@ -421,6 +483,7 @@ loader.load(
         // Evita que o scrub fique alcançando a posição anterior
         controleScroll.getTween()?.progress(1)
         timeline.progress(0)
+        ScrollTrigger.refresh()
 
       } catch(erro){
         console.log('Erro ao trocar de tropa:', erro)

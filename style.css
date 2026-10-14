@@ -108,7 +108,7 @@ body{
 .titulo-esquerda{
     white-space: pre;
     left: 10%;
-    text-align: left;
+    text-align: center;
     line-height: 0.9;
 }
 
@@ -244,7 +244,7 @@ body{
 
 .titulo-esquerda {
   left: 8%;
-  white-space: normal;
+  white-space: pre;
 }
 
 .titulo-direita {
@@ -269,84 +269,89 @@ body{
   cursor: wait;
 }
 
-/* TABLET */
-@media (min-width: 768px) and (max-width: 1023px) {
-  .abertura {
-    --titulo-direita-inicial: 5%;
-    --titulo-largura-inicial: 34%;
-
-    --titulo-top-descricao: 30%;
-    --titulo-direita-descricao: 5%;
-    --titulo-largura-descricao: 40%;
-  }
-
-  .titulo-esquerda {
-    left: 5%;
-  }
-
-  .titulo-esquerda,
-  .titulo-direita {
-    font-size: clamp(36px, 5vw, 52px);
-  }
-
-  .descricao-tropa {
-    top: 42%;
-    right: 5%;
-    width: 40%;
-    max-height: 49%;
-    font-size: 16px;
-  }
-}
-
-/* CELULAR — também atende telas deitadas com pouca altura */
+/* CELULARES E TABLETS */
 @media (max-width: 767px),
+       (max-width: 1366px) and (orientation: portrait),
        (max-width: 1023px) and (max-height: 500px) {
-  .abertura {
-    --titulo-top-inicial: 18%;
-    --titulo-direita-inicial: 6%;
-    --titulo-largura-inicial: 54%;
 
-    --titulo-top-descricao: 44%;
+  .abertura {
+    /* Primeiro: título abaixo do anel */
+    --titulo-top-inicial: 67%;
+    --titulo-direita-inicial: 6%;
+    --titulo-largura-inicial: 88%;
+
+    /* Depois: título sobe junto com a apresentação */
+    --titulo-top-descricao: 45%;
     --titulo-direita-descricao: 6%;
     --titulo-largura-descricao: 88%;
-  }
 
-  .titulo-esquerda,
-  .titulo-direita {
-    font-size: clamp(28px, 7vw, 42px);
+    --fonte-titulo-mobile: clamp(50px, 7vw, 48px);
   }
 
   .titulo-esquerda {
+    top: 22%;
     left: 6%;
-    width: 28%;
+    width: 88%;
+    transform: none;
+
+    white-space: pre;
+    text-align: center;
+    font-size: var(--fonte-titulo-mobile);
+    line-height: 0.95;
+  }
+
+  .titulo-direita {
+    top: var(--titulo-top-inicial);
+    right: var(--titulo-direita-inicial);
+    width: var(--titulo-largura-inicial);
+    transform: none;
+
+    font-size: var(--fonte-titulo-mobile);
+    line-height: 0.95;
+    text-align: center;
   }
 
   .descricao-tropa {
-    top: 54%;
-    right: 6%;
-    width: 88%;
-    max-height: 40%;
+    top: calc(
+      var(--titulo-top-descricao) +
+      var(--fonte-titulo-mobile) * 1.9 +
+      16px
+    );
+
+    width: min(76%, 440px);
+    right: max(12%, calc((100% - 440px) / 2));
+
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.45;
+    text-align: center;
+
+    max-height: none;
+    overflow: visible;
   }
 
   .simbolo {
-    width: 90vw;
-    max-height: 65svh;
+    width: min(88vw, 680px);
+    max-height: 70svh;
   }
 
   .titulo-escolha {
-    top: 9%;
-    font-size: clamp(28px, 7vw, 42px);
+    top: 15%;
+    font-size: clamp(32px, 7vw, 56px);
+    padding: 0 24px;
   }
 
   .opcoes-tropas {
-    bottom: 10%;
-    gap: 24px;
+    bottom: max(10%, env(safe-area-inset-bottom));
+    gap: 28px;
+  }
+
+  .opcoes-tropa {
+    width: 48px;
+    height: 48px;
   }
 
   .aviso-scroll {
-    bottom: 24px;
+    bottom: max(24px, env(safe-area-inset-bottom));
     font-size: 12px;
   }
 }
